@@ -28,10 +28,22 @@ verticalWin :: Int16 -> Bool
 verticalWin grid = (grid .&. shiftL grid 4 .&. shiftL grid 8) > 0
 
 diagonalWin :: Int16 -> Bool
-diagonalWin grid = grid .&. firstDiagonal == firstDiagonal || grid .&. secondDiagonal == secondDiagonal 
+diagonalWin grid = grid .&. firstDiagonal == firstDiagonal || grid .&. secondDiagonal == secondDiagonal
 
 isWinning :: Int16 -> Bool
 isWinning grid = horizontalWin grid || verticalWin grid || diagonalWin grid
+
+getBestMove :: [(Int, Int)] -> (Int, Int)
+getBestMove moves
+  | any (\move -> snd move == -1) moves = head (filter (\move -> snd move == -1) moves)
+  | any (\move -> snd move == 0) moves  = head (filter (\move -> snd move == 0) moves)
+  | otherwise                           = head moves
+
+minimax :: Int16 -> Int16 -> (Int, Int)
+minimax p1Grid p2Grid
+  | isWinning p2Grid                          = (11, -1)
+  | (p1Grid .|. p2Grid) `xor` gridFilter == 0 = (11, 0)
+  | otherwise                                 = getBestMove $ getMoves p1Grid p2Grid
 
 main :: IO ()
 main = do
