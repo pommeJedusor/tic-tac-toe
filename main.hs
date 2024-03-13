@@ -3,17 +3,20 @@ import Data.Bits
 
 -- constants
 gridFilter :: Int16
-gridFilter = 0b1110_1110_1110
+gridFilter = 0b0111_0111_0111
 
 firstDiagonal :: Int16
-firstDiagonal = 0b1000_0100_0010
+firstDiagonal = 0b0100_0010_0001
 
 secondDiagonal :: Int16
-secondDiagonal = 0b0010_0100_1000
+secondDiagonal = 0b0001_0010_0100
 
 -- functions
-getMoves :: Int16 -> Int16 -> Int16
-getMoves p1Grid p2Grid = (p1Grid .|. p2Grid) `xor` gridFilter
+getBinMoves :: Int16 -> Int16 -> Int16
+getBinMoves p1Grid p2Grid = (p1Grid .|. p2Grid) `xor` gridFilter
+
+getMoves :: Int16 -> Int16 -> [Int]
+getMoves p1Grid p2Grid = filter (\x -> getBinMoves p1Grid p2Grid .&. shiftL 1 x > 0) [0..10]
 
 makeMove :: Int16 -> Int -> Int16
 makeMove grid move = grid .|. shiftL 1 move
@@ -34,4 +37,4 @@ main :: IO ()
 main = do
     let p1Grid = 0b0
     let p2Grid = 0b0
-    print $ isWinning gridFilter
+    print $ getMoves p1Grid p2Grid
