@@ -59,11 +59,26 @@ getCharBoard board1 board2 pos
 seeBoard p1Grid p2Grid = do
   putStrLn $ map (getCharBoard p1Grid p2Grid) [0..10]
 
+game p1Grid p2Grid = do
+  -- bot part
+  seeBoard p1Grid p2Grid
+  let moveBot = minimax p1Grid p2Grid 42
+  printf "le coup que le bot joue est %d\n" $ fst moveBot
+  printf "le score est de %d\n" $ snd moveBot
+  let newP1Grid = makeMove p1Grid $ fst moveBot
+  -- player part
+  seeBoard newP1Grid p2Grid
+  printf "quel coup souhaitez vous joué?"
+  playerMoveStr <- getLine
+  let playerMove = read playerMoveStr :: Int
+  printf "votre coup est %d\n" playerMove
+  let newP2Grid = makeMove p2Grid playerMove
+  seeBoard newP1Grid newP2Grid
+  -- recursive
+  game newP1Grid newP2Grid
+
 main :: IO ()
 main = do
     let p1Grid = 0b0000_0000_0000
     let p2Grid = 0b0000_0000_0000
-    seeBoard p1Grid p2Grid
-    let move0 = minimax p1Grid p2Grid 42
-    printf "le coup joué est %d\n" $ fst move0
-    seeBoard p2Grid . makeMove p1Grid $ fst move0
+    game p1Grid p2Grid
