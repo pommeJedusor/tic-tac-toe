@@ -35,18 +35,18 @@ isWinning grid = horizontalWin grid || verticalWin grid || diagonalWin grid
 
 getBestMove :: [(Int, Int)] -> (Int, Int)
 getBestMove moves
-  | any (\move -> snd move == -1) moves = head (filter (\move -> snd move == -1) moves)
+  | any (\move -> snd move == -1) moves = (fst $ head (filter (\move -> snd move == -1) moves), 1)
   | any (\move -> snd move == 0) moves  = head (filter (\move -> snd move == 0) moves)
-  | otherwise                           = head moves
+  | otherwise                           = (fst $ head moves, -1)
 
-minimax :: Int16 -> Int16 -> (Int, Int)
-minimax p1Grid p2Grid
-  | isWinning p2Grid                          = (11, -1)
-  | (p1Grid .|. p2Grid) `xor` gridFilter == 0 = (11, 0)
-  | otherwise                                 = getBestMove $ getMoves p1Grid p2Grid
+minimax :: Int16 -> Int16 -> Int -> (Int, Int)
+minimax p1Grid p2Grid move
+  | isWinning p2Grid                          = (move, -1)
+  | (p1Grid .|. p2Grid) `xor` gridFilter == 0 = (move, 0)
+  | otherwise                                 = getBestMove (map (\x -> minimax p2Grid (makeMove p1Grid x) move) (getMoves p1Grid p2Grid))
 
 main :: IO ()
 main = do
-    let p1Grid = 0b0
-    let p2Grid = 0b0
-    print $ getMoves p1Grid p2Grid
+    let p1Grid = 0b0010_0000_0000
+    let p2Grid = 0b0000_0010_0001
+    print $ minimax p1Grid p2Grid 1
