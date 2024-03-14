@@ -43,10 +43,15 @@ minimax :: Int16 -> Int16 -> Int -> (Int, Int)
 minimax p1Grid p2Grid move
   | isWinning p2Grid                          = (move, -1)
   | (p1Grid .|. p2Grid) `xor` gridFilter == 0 = (move, 0)
-  | otherwise                                 = getBestMove (map (\x -> minimax p2Grid (makeMove p1Grid x) move) (getMoves p1Grid p2Grid))
+  | otherwise                                 = getBestMove (map (\x -> minimax p2Grid (makeMove p1Grid x) (if move==42 then x else move)) (getMoves p1Grid p2Grid))
+
+moveToXY :: Int -> (Int, Int)
+moveToXY move = (move `mod` 4 + 1, move `div` 4 + 1)
 
 main :: IO ()
 main = do
-    let p1Grid = 0b0010_0000_0000
-    let p2Grid = 0b0000_0010_0001
-    print $ minimax p1Grid p2Grid 1
+    let p1Grid = 0b0100_0000_0000
+    let p2Grid = 0b0010_0000_0000
+    print $ getMoves p1Grid p2Grid
+    print $ map moveToXY (getMoves p1Grid p2Grid)
+    print $ minimax p1Grid p2Grid 42
