@@ -1,5 +1,6 @@
 import Data.Int
 import Data.Bits
+import Text.Printf
 
 -- constants
 gridFilter :: Int16
@@ -48,10 +49,21 @@ minimax p1Grid p2Grid move
 moveToXY :: Int -> (Int, Int)
 moveToXY move = (move `mod` 4 + 1, move `div` 4 + 1)
 
+getCharBoard :: Int16 -> Int16 -> Int -> Char
+getCharBoard board1 board2 pos
+  | (pos+1) `mod` 4 == 0        = '\n'
+  | shiftL 1 pos .&. board1 > 0 = '1'
+  | shiftL 1 pos .&. board2 > 0 = '2'
+  | otherwise                   = '0'
+
+seeBoard p1Grid p2Grid = do
+  putStrLn $ map (getCharBoard p1Grid p2Grid) [0..10]
+
 main :: IO ()
 main = do
-    let p1Grid = 0b0100_0000_0000
-    let p2Grid = 0b0010_0000_0000
-    print $ getMoves p1Grid p2Grid
-    print $ map moveToXY (getMoves p1Grid p2Grid)
-    print $ minimax p1Grid p2Grid 42
+    let p1Grid = 0b0000_0000_0000
+    let p2Grid = 0b0000_0000_0000
+    seeBoard p1Grid p2Grid
+    let move0 = minimax p1Grid p2Grid 42
+    printf "le coup joué est %d\n" $ fst move0
+    seeBoard p2Grid . makeMove p1Grid $ fst move0
